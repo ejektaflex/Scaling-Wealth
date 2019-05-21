@@ -1,8 +1,7 @@
-import net.minecraftforge.gradle.user.patcherUser.forge.ForgeExtension
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val v_forge = "1.12.2-14.23.5.2768"
+val v_forge = "1.12.2-14.23.5.2779"
 val v_forgelin = "1.8.2"
 val v_jei = "4.11.0.206"
 val v_minecraft_root = "1.12"
@@ -21,9 +20,9 @@ buildscript {
     }
 }
 
-val bouVersion: String
+val scaVersion: String
     get() {
-        val versionFile = File("src/main/kotlin/ejektaflex/bountiful/BountifulInfo.kt")
+        val versionFile = File("src/main/kotlin/ejektaflex/scalingwealth/ScalingWealthInfo.kt")
         val gotVersion = if (versionFile.exists()) {
             versionFile.readLines().find { "VERSION" in it }?.dropWhile { it != '"' }?.drop(1)?.dropLast(1) ?: "UNDEFINED"
         } else {
@@ -33,10 +32,10 @@ val bouVersion: String
         return gotVersion
     }
 
-version = bouVersion
+version = scaVersion
 
 base {
-    archivesBaseName = "Bountiful"
+    archivesBaseName = "ScalingWealth"
 }
 
 plugins {
@@ -71,14 +70,8 @@ repositories {
 }
 
 dependencies {
+    compile(files("libs"))
     subprojects.forEach { compile(it) }
-    api("net.shadowfacts:Forgelin:$v_forgelin")
-    deobfProvided("mezz.jei:jei_$v_minecraft:$v_jei:api")
-    runtime("mezz.jei:jei_$v_minecraft:$v_jei")
-
-    compileOnly(files("libonly/GameStages-$v_minecraft-$v_gamestages-deobf.jar"))
-    compileOnly("net.darkhax.bookshelf:Bookshelf-$v_minecraft:$v_bookshelf:deobf")
-
     compile(kotlin("stdlib", "1.3.10"))
 }
 
