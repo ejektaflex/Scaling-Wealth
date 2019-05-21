@@ -1,4 +1,4 @@
-package ejektaflex.bountiful.proxy
+package ejektaflex.scalingwealth.proxy
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
