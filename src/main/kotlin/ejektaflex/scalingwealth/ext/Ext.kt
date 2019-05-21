@@ -1,9 +1,12 @@
 package ejektaflex.scalingwealth.ext
 
+import net.minecraft.command.ICommandSender
 import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.text.TextComponentString
+import net.minecraft.util.text.TextComponentTranslation
 import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.minecraftforge.oredict.OreDictionary
 
@@ -58,4 +61,8 @@ val Entity.registryName: ResourceLocation?
         }
         return valid.firstOrNull()?.key
     }
+
+fun ICommandSender.sendMessage(str: String) = sendMessage(TextComponentString(str))
+
+fun ICommandSender.sendTranslation(key: String) = sendMessage(TextComponentTranslation(key))
 

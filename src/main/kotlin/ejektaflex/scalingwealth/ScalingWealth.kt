@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent
 import org.apache.logging.log4j.Logger
 import java.io.File
 
@@ -37,16 +38,8 @@ object ScalingWealth : IProxy {
     @Mod.Instance
     var instance: ScalingWealth? = this
 
-    @Mod.EventHandler
-    override fun preInit(e: FMLPreInitializationEvent) {
-        logger = e.modLog
-
-        configLocation = File(e.modConfigurationDirectory, "scalingwealth").also {
-            if (!it.exists()) {
-                it.mkdirs()
-            }
-        }
-
+    fun loadFiles() {
+        logger.info("Loading ScalingWealth JSON files for data population..")
         configFile = File(configLocation, "config.json").also {
             if (!it.exists()) {
                 it.createNewFile()
@@ -65,6 +58,19 @@ object ScalingWealth : IProxy {
                 drops = gson.fromJson(it.readText(), DataStructure::class.java)
             }
         }
+    }
+
+    @Mod.EventHandler
+    override fun preInit(e: FMLPreInitializationEvent) {
+        logger = e.modLog
+
+        configLocation = File(e.modConfigurationDirectory, "scalingwealth").also {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+
+        loadFiles()
 
         MinecraftForge.EVENT_BUS.register(proxy)
         proxy.preInit(e)
@@ -80,7 +86,20 @@ object ScalingWealth : IProxy {
         proxy.postInit(e)
     }
 
-    //@Mod.EventHandler
-    //fun serverLoad(e: FMLServerStartingEvent) = e.registerServerCommand(BountyCommand())
+    fun warnErrors(warningMethod: String.() -> Unit = { logger.warn(this) }) {
+        // Warn user of erroring items in console
+        for ((_, emap) in ScalingWealth.drops.entities) {
+            for ((interval, pool) in emap) {
+                for (definition in pool) {
+                    if (definition.toItemStack() == null) {
+                        warningMethod("Definition does not exist!: $definition")
+                    }
+                }
+            }
+        }
+    }
+
+    @Mod.EventHandler
+    fun serverLoad(e: FMLServerStartingEvent) = e.registerServerCommand(ScalingWealthCommand())
 
 }

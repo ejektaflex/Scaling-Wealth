@@ -1,11 +1,13 @@
 package ejektaflex.scalingwealth
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 class ConfigOptions {
 
-    @SerializedName("Dummy Variable")
-    var genDefaults = true
+    @Expose
+    @SerializedName("Warn Erroring Items on Startup?")
+    var warnErroringItemsOnStartup = true
 
 
 }
