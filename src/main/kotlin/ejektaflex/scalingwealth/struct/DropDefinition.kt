@@ -7,15 +7,16 @@ import com.google.gson.annotations.SerializedName
 data class DropDefinition(
         @Expose val chance: Double = 1.0,
         @Expose val item: String = "minecraft:dirt",
-        @Expose @SerializedName("amount")
-        val amountString: String = "1-1",
         @Expose val nbt: JsonElement? = null
 ) {
 
-    val amountRange: IntRange by lazy {
-        val amts = amountString.split('-')
-        amts[0].toInt()..amts[1].toInt()
-    }
+    @SerializedName("min")
+    @Expose var amtMin = 1
+    @Expose @SerializedName("max")
+    var amtMax = 1
+
+    val amtRange: IntRange
+        get() = amtMin..amtMax
 
     fun toItemStack() {
 

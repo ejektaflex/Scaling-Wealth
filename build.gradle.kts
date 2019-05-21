@@ -28,7 +28,7 @@ val scaVersion: String
         } else {
             "UNDEFINED"
         }
-        println("build.gradle.kts got Bountiful version: $gotVersion")
+        println("build.gradle.kts got Scaling Wealth version: $gotVersion")
         return gotVersion
     }
 
@@ -61,12 +61,6 @@ repositories {
     jcenter()
     // Forgelin
     maven("http://maven.shadowfacts.net/")
-    // Maven for JEI
-    maven("http://dvs1.progwml6.com/files/maven")
-    // CurseForge Maven
-    maven("https://minecraft.curseforge.com/api/maven/")
-    // MMD Maven
-    maven("https://maven.mcmoddev.com/")
 }
 
 dependencies {
