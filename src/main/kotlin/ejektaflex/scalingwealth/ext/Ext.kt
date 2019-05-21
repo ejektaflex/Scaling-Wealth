@@ -1,7 +1,10 @@
 package ejektaflex.scalingwealth.ext
 
+import net.minecraft.entity.Entity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.fml.common.registry.ForgeRegistries
 import net.minecraftforge.oredict.OreDictionary
 
 val String.toMeta: Int
@@ -46,3 +49,13 @@ val ItemStack.toPretty: String
 
         return proto
     }
+
+val Entity.registryName: ResourceLocation?
+    get() {
+        val valid = ForgeRegistries.ENTITIES.entries.filter {
+            this::class.java.isAssignableFrom(it.value.entityClass) &&
+                    it.value.entityClass.isAssignableFrom(this::class.java)
+        }
+        return valid.firstOrNull()?.key
+    }
+

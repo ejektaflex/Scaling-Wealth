@@ -15,7 +15,7 @@ class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") 
     }
 
     val coords: Pair<Int, Int> by lazy {
-        rangeRaw.drop(1).dropLast(1).split(',').map { it.toInt() }.let {
+        rangeRaw.drop(1).dropLast(1).split(',').map { it.trim().toInt() }.let {
             it[0] to it[1]
         }
     }
@@ -31,20 +31,23 @@ class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") 
         get() = IntervalType.values().firstOrNull { it.right == rangeRaw.last() }
                 ?: throw IntervalBoundsException(rangeRaw.last())
 
-    operator fun contains(n: Int): Boolean {
+    operator fun contains(d: Double): Boolean {
         return when (startBounds) {
-            IntervalType.OPEN -> coords.first < n
-            IntervalType.CLOSED -> coords.first <= n
+            IntervalType.OPEN -> coords.first < d
+            IntervalType.CLOSED -> coords.first <= d
         } && when (endBounds) {
-            IntervalType.OPEN -> n < coords.second
-            IntervalType.CLOSED -> n <= coords.second
+            IntervalType.OPEN -> d < coords.second
+            IntervalType.CLOSED -> d <= coords.second
         }
     }
+
+    operator fun contains(n: Int) = contains(n.toDouble())
 
     override fun toString(): String {
         return rangeRaw
     }
 
+    // Nice and easy JSON bidi serialization
     class IntervalAdapter : TypeAdapter<Interval>() {
 
         override fun write(out: JsonWriter, value: Interval) {
