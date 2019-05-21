@@ -1,10 +1,9 @@
 package ejektaflex.scalingwealth
 
 import com.google.gson.GsonBuilder
-import ejektaflex.scalingwealth.config.ConfigOptions
-import ejektaflex.scalingwealth.defaults.DefaultData
 import ejektaflex.scalingwealth.proxy.IProxy
-import ejektaflex.scalingwealth.struct.WealthStructure
+import ejektaflex.scalingwealth.struct.Interval
+import ejektaflex.scalingwealth.struct.DataStructure
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.SidedProxy
@@ -21,7 +20,11 @@ object ScalingWealth : IProxy {
     @SidedProxy(clientSide = ScalingWealthInfo.CLIENT, serverSide = ScalingWealthInfo.SERVER)
     @JvmStatic lateinit var proxy: IProxy
 
-    private var gson = GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create()
+    private var gson = GsonBuilder()
+            .excludeFieldsWithoutExposeAnnotation()
+            .setPrettyPrinting()
+            .registerTypeAdapter(Interval::class.java, Interval.IntervalAdapter())
+            .create()
 
     lateinit var configLocation: File
     lateinit var configFile: File
@@ -29,7 +32,7 @@ object ScalingWealth : IProxy {
     lateinit var logger: Logger
 
     var config = ConfigOptions()
-    var drops = WealthStructure()
+    var drops = DataStructure()
 
     @Mod.Instance
     var instance: ScalingWealth? = this
@@ -55,7 +58,11 @@ object ScalingWealth : IProxy {
 
         dropsFile = File(configLocation, "drops.json").also {
             if (!it.exists()) {
+                drops = DefaultData
                 it.createNewFile()
+                it.writeText(gson.toJson(drops))
+            } else {
+                drops = gson.fromJson(it.readText(), DataStructure::class.java)
             }
         }
 
@@ -66,10 +73,6 @@ object ScalingWealth : IProxy {
     @Mod.EventHandler
     override fun init(e: FMLInitializationEvent) {
         proxy.init(e)
-        drops = DefaultData
-        dropsFile.writeText(gson.toJson(drops))
-        println("DROPS")
-        println(gson.toJson(drops))
     }
 
     @Mod.EventHandler

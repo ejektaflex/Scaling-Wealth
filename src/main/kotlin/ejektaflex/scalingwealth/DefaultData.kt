@@ -1,10 +1,10 @@
-package ejektaflex.scalingwealth.defaults
+package ejektaflex.scalingwealth
 
 import ejektaflex.scalingwealth.struct.DropDefinition
 import ejektaflex.scalingwealth.struct.Interval
-import ejektaflex.scalingwealth.struct.WealthStructure
+import ejektaflex.scalingwealth.struct.DataStructure
 
-object DefaultData : WealthStructure() {
+object DefaultData : DataStructure() {
     init {
         entities["minecraft:zombie"] = mutableMapOf(
                 Interval("(0, 100)") to mutableListOf(
@@ -16,7 +16,7 @@ object DefaultData : WealthStructure() {
                 Interval("(50, 150)") to mutableListOf(
                         DropDefinition(
                                 chance = 0.5,
-                                item = "minecraft:dirt"
+                                item = "minecraft:stone"
                         )
                 )
         )

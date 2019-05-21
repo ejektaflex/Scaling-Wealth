@@ -14,7 +14,6 @@ open class CommonProxy : IProxy {
     fun entityDrops(e: LivingDropsEvent) {
         println("Entity: ${e.entity.name} is dropping: ${e.drops.joinToString { it.displayName.toString() }}")
         val diff = ScalingHealthAPI.getEntityDifficulty(e.entityLiving)
-
     }
 
 }

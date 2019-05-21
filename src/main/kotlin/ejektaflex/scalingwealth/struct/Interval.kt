@@ -1,7 +1,10 @@
 package ejektaflex.scalingwealth.struct
 
+import com.google.gson.TypeAdapter
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 
 
 class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") {
@@ -40,6 +43,18 @@ class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") 
 
     override fun toString(): String {
         return rangeRaw
+    }
+
+    class IntervalAdapter : TypeAdapter<Interval>() {
+
+        override fun write(out: JsonWriter, value: Interval) {
+            out.value(value.toString())
+        }
+
+        override fun read(input: JsonReader): Interval {
+            return Interval(input.nextString())
+        }
+
     }
 
 }
