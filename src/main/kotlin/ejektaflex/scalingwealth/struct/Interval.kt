@@ -7,12 +7,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
 
-class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") {
-
-    private enum class IntervalType(val left: Char, val right: Char) {
-        OPEN('(', ')'),
-        CLOSED('[', ']')
-    }
+class Interval(@Expose @SerializedName("range") val rangeRaw: String = "[0,0]") {
 
     val coords: Pair<Int, Int> by lazy {
         rangeRaw.drop(1).dropLast(1).split(',').map { it.trim().toInt() }.let {
@@ -20,24 +15,37 @@ class Interval(@Expose @SerializedName("range") var rangeRaw: String = "[0,0]") 
         }
     }
 
+    private enum class IntervalType(
+            val left: Char,
+            val right: Char,
+            val checkStart: Interval.(it: Double) -> Boolean,
+            val checkEnd: Interval.(it: Double) -> Boolean,
+            val isReversed: Boolean = false
+    ) {
+        OPEN('(', ')', { coords.first < it }, { it < coords.second }),
+        CLOSED('[', ']', { coords.first <= it }, { it <= coords.second }),
+        OPEN_REVERSED(')', '(', { coords.first > it }, { it > coords.second }, true),
+        CLOSED_REVERSED(']', '[', { coords.first >= it }, { it >= coords.second }, true)
+    }
+
     class IntervalBoundsException(invalidMarker: Char) :
             Exception("Bounds created using invalid bracket symbol: '$invalidMarker'")
 
-    private val startBounds: IntervalType
-        get() = IntervalType.values().firstOrNull { it.left == rangeRaw.first() }
+    private val startBounds: IntervalType by lazy {
+        IntervalType.values().firstOrNull { it.left == rangeRaw.first() }
                 ?: throw IntervalBoundsException(rangeRaw.first())
+    }
 
-    private val endBounds: IntervalType
-        get() = IntervalType.values().firstOrNull { it.right == rangeRaw.last() }
+    private val endBounds: IntervalType by lazy {
+        IntervalType.values().firstOrNull { it.right == rangeRaw.last() }
                 ?: throw IntervalBoundsException(rangeRaw.last())
+    }
 
     operator fun contains(d: Double): Boolean {
-        return when (startBounds) {
-            IntervalType.OPEN -> coords.first < d
-            IntervalType.CLOSED -> coords.first <= d
-        } && when (endBounds) {
-            IntervalType.OPEN -> d < coords.second
-            IntervalType.CLOSED -> d <= coords.second
+        return if (startBounds.isReversed && endBounds.isReversed) {
+            startBounds.checkStart(this, d) || endBounds.checkEnd(this, d)
+        } else {
+            startBounds.checkStart(this, d) && endBounds.checkEnd(this, d)
         }
     }
 
