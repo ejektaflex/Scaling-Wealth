@@ -25,21 +25,20 @@ val String.toMeta: Int
         }
     }
 
-val String.toItemStack: ItemStack?
-    get() {
-        val sect = split(":").toMutableList()
-        if (sect.size !in 2..3) {
-            return null
-        } else if (sect.size == 2) {
-            sect += "0"
-        }
-        val item = Item.getByNameOrId("${sect[0]}:${sect[1]}")
-        return if (item != null) {
-            ItemStack(item, 1, sect[2].toMeta)
-        } else {
-            null
-        }
+fun String.toItemStack(amt: Int = 1): ItemStack? {
+    val sect = split(":").toMutableList()
+    if (sect.size !in 2..3) {
+        return null
+    } else if (sect.size == 2) {
+        sect += "0"
     }
+    val item = Item.getByNameOrId("${sect[0]}:${sect[1]}")
+    return if (item != null) {
+        ItemStack(item, amt, sect[2].toMeta)
+    } else {
+        null
+    }
+}
 
 val ItemStack.toPretty: String
     get() {

@@ -9,5 +9,9 @@ class ConfigOptions {
     @SerializedName("Warn Erroring Items on Startup?")
     var warnErroringItemsOnStartup = true
 
+    @Expose
+    @SerializedName("If [true], loot is based on player difficulty. If [false], loot is based on killed entity difficulty.")
+    var difficultyBasedOnPlayer = true
+
 
 }

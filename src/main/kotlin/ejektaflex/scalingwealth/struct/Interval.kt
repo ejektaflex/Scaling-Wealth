@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
-
 class Interval(@Expose @SerializedName("range") val rangeRaw: String = "[0,0]") {
 
     val coords: Pair<Int, Int> by lazy {

@@ -10,21 +10,19 @@ import net.minecraft.nbt.JsonToNBT
 data class DropDefinition(
         @Expose val chance: Double = 1.0,
         @Expose val item: String = "minecraft:dirt",
+        @Expose val mustBeBlight: Boolean? = null,
         @Expose @SerializedName("nbt")
         val jsonNBT: JsonElement? = null
 ) {
 
-    @SerializedName("min")
-    @Expose var amtMin = 1
-    @Expose @SerializedName("max")
-    var amtMax = 1
+    @SerializedName("amount")
+    @Expose var amount = Interval("[1, 1]")
 
     val amtRange: IntRange
-        get() = amtMin..amtMax
-
+        get() = amount.coords.first..amount.coords.second
 
     fun toItemStack(): ItemStack? {
-        val stack = item.toItemStack
+        val stack = item.toItemStack(amtRange.random())
         jsonNBT?.let {
             stack?.tagCompound = JsonToNBT.getTagFromJson(jsonNBT.toString())
         }
