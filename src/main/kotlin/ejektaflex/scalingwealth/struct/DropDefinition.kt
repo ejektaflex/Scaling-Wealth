@@ -16,10 +16,12 @@ data class DropDefinition(
 ) {
 
     @SerializedName("amount")
-    @Expose var amount = Interval("[1, 1]")
+    @Expose var amount: Interval? = null
 
     val amtRange: IntRange
-        get() = amount.coords.first..amount.coords.second
+        get() {
+            return (amount ?: Interval("[1, 1]")).let { it.coords.first..it.coords.second }
+        }
 
     fun toItemStack(): ItemStack? {
         val stack = item.toItemStack(amtRange.random())

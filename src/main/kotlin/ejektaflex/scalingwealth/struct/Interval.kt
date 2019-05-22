@@ -57,11 +57,11 @@ class Interval(@Expose @SerializedName("range") val rangeRaw: String = "[0,0]") 
     // Nice and easy JSON bidi serialization
     class IntervalAdapter : TypeAdapter<Interval>() {
 
-        override fun write(out: JsonWriter, value: Interval) {
-            out.value(value.toString())
+        override fun write(out: JsonWriter, value: Interval?) {
+            out.value(value?.toString())
         }
 
-        override fun read(input: JsonReader): Interval {
+        override fun read(input: JsonReader): Interval? {
             return Interval(input.nextString())
         }
 
