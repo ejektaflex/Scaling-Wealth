@@ -18,6 +18,10 @@ open class CommonProxy : IProxy {
     @SubscribeEvent
     fun entityDrops(e: LivingDropsEvent) {
 
+        if (e.entity?.world?.isRemote == true) {
+            return
+        }
+
         // Choose how to calculate difficulty
         val diff = when (ScalingWealth.config.difficultyBasedOnPlayer && e.source.trueSource is EntityPlayer) {
             true -> ScalingHealthAPI.getPlayerDifficulty(e.source.trueSource as EntityPlayer)

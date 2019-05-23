@@ -21,7 +21,7 @@ object ScalingWealth : IProxy {
     @SidedProxy(clientSide = ScalingWealthInfo.CLIENT, serverSide = ScalingWealthInfo.SERVER)
     @JvmStatic lateinit var proxy: IProxy
 
-    private var gson = GsonBuilder()
+    var gson = GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting()
             .registerTypeAdapter(Interval::class.java, Interval.IntervalAdapter())
