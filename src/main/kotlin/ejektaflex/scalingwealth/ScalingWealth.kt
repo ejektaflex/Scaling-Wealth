@@ -1,16 +1,16 @@
 package ejektaflex.scalingwealth
 
 import com.google.gson.GsonBuilder
+import ejektaflex.scalingwealth.compat.GetTheOneProbe
 import ejektaflex.scalingwealth.proxy.IProxy
 import ejektaflex.scalingwealth.struct.Interval
 import ejektaflex.scalingwealth.struct.DataStructure
+import mcjty.theoneprobe.TheOneProbe
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.SidedProxy
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent
+import net.minecraftforge.fml.common.event.*
 import org.apache.logging.log4j.Logger
 import java.io.File
 
@@ -79,11 +79,21 @@ object ScalingWealth : IProxy {
     @Mod.EventHandler
     override fun init(e: FMLInitializationEvent) {
         proxy.init(e)
+
+        println("doot applying probe")
+
+        if(Loader.isModLoaded("theoneprobe")) {
+            GetTheOneProbe().apply(TheOneProbe.theOneProbeImp)
+        }
+
     }
 
     @Mod.EventHandler
     override fun postInit(e: FMLPostInitializationEvent) {
         proxy.postInit(e)
+
+        val probe = GetTheOneProbe.probe
+        println("PROBE: $probe")
     }
 
     fun warnErrors(warningMethod: String.() -> Unit = { logger.warn(this) }) {

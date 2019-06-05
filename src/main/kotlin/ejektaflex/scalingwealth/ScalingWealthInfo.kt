@@ -10,7 +10,8 @@ object ScalingWealthInfo {
     const val DEPENDS = "${FORGE_DEP}required-after:forgelin@[1.8.0,1.9.0);" +
             "required-after:silentlib;" +
             "required-after:forgelin;" +
-            "required-after:scalinghealth;"
+            "required-after:scalinghealth;" +
+            "after:theoneprobe;"
 
     const val CLIENT = "ejektaflex.scalingwealth.proxy.ClientProxy"
     const val SERVER = "ejektaflex.scalingwealth.proxy.CommonProxy"

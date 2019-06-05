@@ -61,9 +61,11 @@ repositories {
     jcenter()
     // Forgelin
     maven("http://maven.shadowfacts.net/")
+    maven("https://maven.tterrag.com")
 }
 
 dependencies {
+    compile("mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.28-17")
     compile(files("libs"))
     subprojects.forEach { compile(it) }
     compile(kotlin("stdlib", "1.3.10"))
