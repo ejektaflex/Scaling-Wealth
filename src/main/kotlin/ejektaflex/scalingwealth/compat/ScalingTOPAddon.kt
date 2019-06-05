@@ -27,9 +27,8 @@ class ScalingTOPAddon : IProbeInfoEntityProvider {
             if (player.isSneaking && eName in ScalingWealth.drops.entities.keys) {
                 val playerDiff = ScalingHealthAPI.getPlayerDifficulty(player)
                 val extraDrops = ScalingWealth.drops.entities[eName]!!
-                probeInfo.text("# Drops: ${extraDrops.size}")
                 val numValid = extraDrops.filter { playerDiff.toInt() in it.key }.size
-                probeInfo.text("@ Level: $numValid")
+                probeInfo.text("Drops @ Lvl: $numValid/${extraDrops.size}")
             }
         }
     }
