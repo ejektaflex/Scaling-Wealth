@@ -15,6 +15,18 @@ class DataDSL {
         MobDSL(root.entities[mobName]!!).apply(func)
     }
 
+    fun forMobs(vararg mobNames: String, func: MobDSL.() -> Unit) {
+        for (mobName in mobNames) {
+            forMob(mobName, func)
+        }
+    }
+
+    fun forEveryMob(func: MobDSL.() -> Unit) {
+        for (mobName in root.entities.keys) {
+            forMob(mobName, func)
+        }
+    }
+
     inner class MobDSL(val entry: MutableMap<Interval, MutableList<DropDefinition>>) {
 
         fun forRange(range: IntRange, func: DiffRangeDSL.() -> Unit) {
