@@ -6,6 +6,9 @@ import ejektaflex.scalingwealth.proxy.IProxy
 import ejektaflex.scalingwealth.struct.Interval
 import ejektaflex.scalingwealth.struct.DataStructure
 import mcjty.theoneprobe.TheOneProbe
+import net.minecraft.entity.SharedMonsterAttributes
+import net.minecraft.entity.ai.attributes.IAttribute
+import net.minecraft.entity.ai.attributes.RangedAttribute
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
@@ -25,12 +28,17 @@ object ScalingWealth : IProxy {
             .excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting()
             .registerTypeAdapter(Interval::class.java, Interval.IntervalAdapter())
+            .registerTypeAdapter(RangedAttribute::class.java, AttributeAdapter())
             .create()
 
     lateinit var configLocation: File
     lateinit var configFile: File
     lateinit var dropsFile: File
     lateinit var logger: Logger
+
+    var spawnChance = 1.0
+    var deathGain = 0.2
+    var deathLoss = 0.5
 
     var config = ConfigOptions()
     var drops = DataStructure()

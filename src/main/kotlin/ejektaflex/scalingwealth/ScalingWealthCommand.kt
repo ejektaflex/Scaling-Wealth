@@ -7,6 +7,7 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
+import kotlin.reflect.KMutableProperty0
 import kotlin.system.measureTimeMillis
 
 
@@ -35,6 +36,15 @@ class ScalingWealthCommand : ICommand {
         return playerProfile != null && sender.server?.playerList?.canSendCommands(playerProfile) == true
     }
 
+    fun trySet(sender: ICommandSender, input: String, thing: KMutableProperty0<Double>) {
+        try {
+            thing.set(input.toDouble())
+            sender.sendMessage("You changed ${thing.name} to ${thing.get()}")
+        } catch (e: Exception) {
+            sender.sendMessage("Oops: ${e.message}")
+            e.printStackTrace()
+        }
+    }
 
     @Throws(CommandException::class)
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
@@ -58,6 +68,14 @@ class ScalingWealthCommand : ICommand {
                         }
                     }
                 }
+
+                // Spawn Chance
+                "sc" -> trySet(sender, args[1], ScalingWealth::spawnChance)
+                // Death Gain per Kill
+                "dg" -> trySet(sender, args[1], ScalingWealth::deathGain)
+                // Death Loss per Player Death
+                "dl" -> trySet(sender, args[1], ScalingWealth::deathLoss)
+
             }
         } else {
             sender.sendMessage("Valid commands: '/scw reload")

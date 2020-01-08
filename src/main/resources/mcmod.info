@@ -1,8 +1,8 @@
 [
 {
-  "modid": "bountiful",
-  "name": "Bountiful",
-  "description": "Bountiful adds a bounty board to Minecraft.",
+  "modid": "scalingwealth",
+  "name": "Scaling Wealth",
+  "description": "Scaling Wealth adds different drops based on Scaling Health difficulty.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
