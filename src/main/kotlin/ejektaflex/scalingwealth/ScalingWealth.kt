@@ -28,7 +28,7 @@ object ScalingWealth : IProxy {
             .excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting()
             .registerTypeAdapter(Interval::class.java, Interval.IntervalAdapter())
-            .registerTypeAdapter(RangedAttribute::class.java, AttributeAdapter())
+            .registerTypeAdapter(AttributeContainer::class.java, AttributeContainer.AttributeAdapter())
             .create()
 
     lateinit var configLocation: File

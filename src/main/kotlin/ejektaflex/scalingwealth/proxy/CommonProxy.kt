@@ -1,5 +1,6 @@
 package ejektaflex.scalingwealth.proxy
 
+import ejektaflex.scalingwealth.AttributeContainer
 import ejektaflex.scalingwealth.ScalingWealth
 import ejektaflex.scalingwealth.ext.registryName
 import ejektaflex.scalingwealth.ext.toPretty
@@ -16,10 +17,7 @@ import net.minecraft.potion.Potion
 import net.minecraft.potion.PotionEffect
 import net.minecraft.world.World
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.event.entity.living.LivingDropsEvent
-import net.minecraftforge.event.entity.living.LivingEvent
-import net.minecraftforge.event.entity.living.LivingSpawnEvent
+import net.minecraftforge.event.entity.living.*
 import net.minecraftforge.event.entity.living.LivingSpawnEvent.CheckSpawn
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
@@ -184,10 +182,7 @@ open class CommonProxy : IProxy {
         return retMap
     }
 
-    val keepSpawned = listOf(
-            "thebetweenlands:chiromaw"
 
-    )
 
     // ### Modified Spawn & Despawn Rules (Same;
 
@@ -206,8 +201,8 @@ open class CommonProxy : IProxy {
 
     }
 
-    private fun changeAttribute(entity: EntityLiving, inst: IAttribute, numForMult: Double) {
-        val attr: IAttributeInstance = entity.getEntityAttribute(inst)
+    private fun changeAttribute(entity: EntityLiving, inst: AttributeContainer, numForMult: Double) {
+        val attr: IAttributeInstance = entity.getEntityAttribute(inst.attr)
         attr.let { att ->
 
             val newMax = att.baseValue * numForMult
@@ -254,8 +249,9 @@ open class CommonProxy : IProxy {
                 }
             }
             if (isOut) {
-                if (event.entityLiving.registryName.toString() in keepSpawned) {
+                if (event.entityLiving.registryName.toString() in ScalingWealth.drops.doNotDespawn) {
                     println("Allowed ${event.entityLiving.registryName.toString()} to live")
+                    event.result = Event.Result.DENY
                 } else {
                     event.result = Event.Result.ALLOW
                 }
@@ -277,7 +273,7 @@ open class CommonProxy : IProxy {
             val theTorchbearer = torchbearers.keys.first()
             val effects = torchbearers.values.first()
 
-            println("Only one torchbearer, giving effects to: ${theTorchbearer.displayNameString}")
+            //println("Only one torchbearer, giving effects to: ${theTorchbearer.displayNameString}")
 
             // Torchbearer only effect
             //theTorchbearer.giveEffect(21)
@@ -307,6 +303,22 @@ open class CommonProxy : IProxy {
 
     }
 
+
+    @SubscribeEvent
+    fun targetChange(e: LivingSetAttackTargetEvent) {
+        if (e.target !is EntityPlayer) {
+            if (e.entityLiving.registryName.toString() in ScalingWealth.drops.forcePlayerTargeting) {
+                val players = e.entityLiving.world.playerEntities
+                if (players.size > 0) {
+                    val closestPlayer = players.minBy { e.entityLiving.getDistance(it) }!!
+                    println("Locking onto: ${closestPlayer.displayNameString}")
+                    (e.entityLiving as EntityLiving).attackTarget = closestPlayer
+
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     fun setTorchbearer(e: LivingEvent.LivingUpdateEvent) {
         if (e.entity?.world?.isRemote == true || e.entityLiving !is EntityPlayer) {
@@ -319,7 +331,7 @@ open class CommonProxy : IProxy {
         (e.entityLiving as EntityPlayer).let {
             val holdingStuff = it.heldEquipment.map { item -> item.toPretty }
             if (holdingStuff.any { name -> name in validTorches.keys }) {
-                println("Setting torchbearer effects for ${it.displayNameString}")
+                //println("Setting torchbearer effects for ${it.displayNameString}")
                 torchbearers[it] = getTorchEffects(it)
             } else {
                 torchbearers.remove(it)
@@ -346,7 +358,7 @@ open class CommonProxy : IProxy {
 
         val bonusLuck = playerSrc?.luck?.toInt() ?: 0
 
-        println("Giving $bonusLuck due to bonus luck!")
+        //println("Giving $bonusLuck due to bonus luck!")
 
         val entityKey = e.entityLiving.registryName.toString()
         handleDropsFor("*", e, diff, bonusLuck)
