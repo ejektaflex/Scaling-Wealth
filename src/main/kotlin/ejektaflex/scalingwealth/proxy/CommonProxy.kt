@@ -6,10 +6,7 @@ import ejektaflex.scalingwealth.ext.registryName
 import ejektaflex.scalingwealth.ext.toPretty
 import net.minecraft.block.BlockTorch
 import net.minecraft.entity.EntityLiving
-import net.minecraft.entity.SharedMonsterAttributes
-import net.minecraft.entity.ai.attributes.IAttribute
 import net.minecraft.entity.ai.attributes.IAttributeInstance
-import net.minecraft.entity.ai.attributes.RangedAttribute
 import net.minecraft.entity.monster.IMob
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
@@ -137,42 +134,27 @@ open class CommonProxy : IProxy {
         }
     }
 
-    fun EntityPlayer.giveEffect(eid: Int) {
-        val toGive = PotionEffect(Potion.getPotionById(eid) ?: Potion.getPotionById(1)!!, 50)
+    fun EntityPlayer.giveEffect(eid: Int, amp: Int) {
+        val toGive = PotionEffect(Potion.getPotionById(eid) ?: Potion.getPotionById(1)!!, 50, amp)
         this.addPotionEffect(toGive)
     }
 
     val dist = 5f
 
-    var torchbearers: MutableMap<EntityPlayer, Map<Int, Float>> = mutableMapOf()
+    var torchbearers: MutableMap<EntityPlayer, Map<Int, Array<Float>>> = mutableMapOf()
 
-    val validTorches = mapOf<String, Map<Int, Float>>(
-            "minecraft:torch" to mapOf(
-                    11 to 5f    // Resistance
-            ),
-            "minecraft:redstone_torch" to mapOf(
-                    3 to 5f     // Haste
-            ),
-            "thebetweenlands:sulfur_torch" to mapOf(
-                    90 to 5f    // Learning
-            ),
-            "rustic:golden_lantern" to mapOf(
-                    10 to 1.85f  // Regeneration
-            ),
-            "rustic:iron_lantern" to mapOf(
-                    26 to 5f    // Luck
-            ),
-            "quark:paper_lantern" to mapOf(
-                    13 to 7f    // Water Breathing
-            )
+
+    val unsharedEffects = listOf(
+            10,
+            9
     )
 
-    private fun getTorchEffects(player: EntityPlayer): Map<Int, Float> {
+    private fun getTorchEffects(player: EntityPlayer): Map<Int, Array<Float>> {
         val maps = player.heldEquipment.map { item -> item.toPretty }
-                .filter { it in validTorches.keys }
-                .mapNotNull { validTorches[it] }
+                .filter { it in ScalingWealth.drops.validTorches.keys }
+                .mapNotNull { ScalingWealth.drops.validTorches[it] }
 
-        val retMap = mutableMapOf<Int, Float>()
+        val retMap = mutableMapOf<Int, Array<Float>>()
         for (map in maps) {
             for (key: Int in map.keys) {
                 retMap[key] = map[key] ?: error("Oh noes, $key was not found in map")
@@ -282,11 +264,11 @@ open class CommonProxy : IProxy {
 
                 for (effect in effects) {
 
-                    if (player.getDistance(theTorchbearer) <= effect.value) {
-                        if (player.displayNameString == theTorchbearer.displayNameString && effect.key in validTorches["rustic:golden_lantern"]!!.keys) {
-                            // Player is the torchbearer holding golden lantern
-                        } else {
-                            player.giveEffect(effect.key)
+                    if (player.getDistance(theTorchbearer) <= effect.value[0].toDouble()) {
+
+                        if (player.displayNameString == theTorchbearer.displayNameString && effect.key !in unsharedEffects) {
+                            val amp = effect.value[1].toInt()
+                            player.giveEffect(effect.key, amp)
                         }
                     }
 
@@ -330,7 +312,7 @@ open class CommonProxy : IProxy {
 
         (e.entityLiving as EntityPlayer).let {
             val holdingStuff = it.heldEquipment.map { item -> item.toPretty }
-            if (holdingStuff.any { name -> name in validTorches.keys }) {
+            if (holdingStuff.any { name -> name in ScalingWealth.drops.validTorches.keys }) {
                 //println("Setting torchbearer effects for ${it.displayNameString}")
                 torchbearers[it] = getTorchEffects(it)
             } else {
