@@ -144,11 +144,6 @@ open class CommonProxy : IProxy {
     var torchbearers: MutableMap<EntityPlayer, Map<Int, Array<Float>>> = mutableMapOf()
 
 
-    val unsharedEffects = listOf(
-            10,
-            9
-    )
-
     private fun getTorchEffects(player: EntityPlayer): Map<Int, Array<Float>> {
         val maps = player.heldEquipment.map { item -> item.toPretty }
                 .filter { it in ScalingWealth.drops.validTorches.keys }
@@ -249,6 +244,8 @@ open class CommonProxy : IProxy {
             return
         }
 
+        println("Current torchbearers: ${torchbearers.keys.map { it.displayNameString }}")
+
         if (torchbearers.size == 1) {
 
 
@@ -264,12 +261,18 @@ open class CommonProxy : IProxy {
 
                 for (effect in effects) {
 
-                    if (player.getDistance(theTorchbearer) <= effect.value[0].toDouble()) {
+                    if (player.getDistance(theTorchbearer) <= effect.value[0]) {
 
-                        if (player.displayNameString == theTorchbearer.displayNameString && effect.key !in unsharedEffects) {
+                        if (player.displayNameString == theTorchbearer.displayNameString) {
+                            if (effect.key !in ScalingWealth.drops.unshared) {
+                                val amp = effect.value[1].toInt()
+                                player.giveEffect(effect.key, amp)
+                            }
+                        } else {
                             val amp = effect.value[1].toInt()
                             player.giveEffect(effect.key, amp)
                         }
+
                     }
 
                 }
@@ -277,9 +280,11 @@ open class CommonProxy : IProxy {
 
             }
 
-        } else {
+        } else if (torchbearers.size >= 2) {
 
-            println("Current torchbearers: ${torchbearers.keys.map { it.displayNameString }}")
+            for (falseBearer in torchbearers.keys.drop(1)) {
+                falseBearer.giveEffect(20, 1)
+            }
 
         }
 

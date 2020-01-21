@@ -30,6 +30,10 @@ open class DataStructure {
             "twilightforest:fire_beetle",
             "twilightforest:slime_beetle"
     )
+    @Expose val unshared = listOf(
+            10,
+            9
+    )
     @Expose val validTorches = mapOf<String, Map<Int, Array<Float>>>(
             "minecraft:torch" to mapOf(
                     11 to arrayOf(5f, 0f)    // Resistance
